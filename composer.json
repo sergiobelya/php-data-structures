@@ -1,0 +1,23 @@
+{
+    "name": "sergiobelya/data-structures",
+    "description": "PHP library for data structures like Sorted Linked List",
+    "type": "library",
+    "require-dev": {
+        "phpunit/phpunit": "^10.5",
+        "phpstan/phpstan": "^2.1",
+        "squizlabs/php_codesniffer": "^4.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Sergiobelya\\DataStructures\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Serhii Bieliakov",
+            "email": "sergiobelya@gmail.com"
+        }
+    ],
+    "require": {}
+}
