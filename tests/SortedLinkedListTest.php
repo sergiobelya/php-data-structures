@@ -102,4 +102,34 @@ final class SortedLinkedListTest extends TestCase
         $list->add('6');
         $this->assertSame(2, $list->count());
     }
+
+    public function testIteration(): void
+    {
+        $list = new SortedLinkedList();
+        $list->add('a6');
+        $list->add('a5');
+
+        $concatResult = '';
+        $i = 0;
+        foreach ($list as $value) {
+            $concatResult .= $value;
+            $i++;
+        }
+        $this->assertSame('a5a6', $concatResult);
+        $this->assertSame(2, $i);
+    }
+
+    public function testEmptyIteration(): void
+    {
+        $list = new SortedLinkedList();
+
+        $concatResult = '';
+        $i = 0;
+        foreach ($list as $value) {
+            $concatResult .= $value;
+            $i++;
+        }
+        $this->assertSame('', $concatResult);
+        $this->assertSame(0, $i);
+    }
 }
