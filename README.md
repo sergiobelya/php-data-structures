@@ -7,7 +7,9 @@ The data structure that consists of elements, each containing a link to the next
 ### Available actions
 - add
 - delete
-- exists
+- shift
+- pop
+- isValueExists
 - count
 - reverse
 - toArray

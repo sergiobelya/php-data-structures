@@ -54,17 +54,6 @@ class SortedLinkedList implements Countable, IteratorAggregate
         }
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
-    private function checkValueType(int|string $value): void
-    {
-        if ($this->isNotValidInt($value)
-            || $this->isNotValidString($value)) {
-            throw new InvalidArgumentException("Value type should be the same as other values in SortedLinkedList");
-        }
-    }
-
     private function isNotValidInt(int|string $value): bool
     {
         return is_int($value) && !is_int($this->rootNode->getValue());
@@ -96,11 +85,6 @@ class SortedLinkedList implements Countable, IteratorAggregate
         $nextNode = $currentNode->getNextNode();
         $currentNode->setNextNode($addedNode);
         $addedNode->setNextNode($nextNode);
-    }
-
-    private function isFirstNodeBeforeSecond(Node $firstNode, Node $secondNode): bool
-    {
-        return $this->comparator->isFirstNodeBeforeSecond($firstNode, $secondNode);
     }
 
     public function isEmpty(): bool
@@ -152,7 +136,7 @@ class SortedLinkedList implements Countable, IteratorAggregate
         $exists = false;
         $currentNode = $this->rootNode;
         // iterate while $currentNode before or equal to checked value
-        while ($currentNode && !$this->isFirstNodeBeforeSecond($tempNode, $currentNode)) {
+        while ($currentNode && $this->isFirstNodeBeforeOrEqualToSecond($currentNode, $tempNode)) {
             if ($currentNode->getValue() === $value) {
                 $exists = true;
                 break;
@@ -161,5 +145,95 @@ class SortedLinkedList implements Countable, IteratorAggregate
         }
 
         return $exists;
+    }
+
+    /**
+     * Delete all nodes with values equal to $value
+     * @throws InvalidArgumentException
+     */
+    public function delete(string|int $value): void
+    {
+        $this->checkValueType($value);
+        $nodeBeforeValue = null;
+        $currentNode = $this->rootNode;
+        $tempNode = $this->nodeFactory->createNode($value);
+
+        // iterate while $currentNode before or equal to checked value
+        while ($currentNode && $this->isFirstNodeBeforeOrEqualToSecond($currentNode, $tempNode)) {
+            if ($currentNode->getValue() === $value) {
+                // delete $currentNode by linking next node to previous
+                if ($nodeBeforeValue) {
+                    $nodeAfterValue = $currentNode->getNextNode();
+                    $nodeBeforeValue->setNextNode($nodeAfterValue);
+                } else {
+                    // if previous node is not exists, the $currentNode is root, so we'll change root
+                    $this->rootNode = $currentNode->getNextNode();
+                }
+            } else {
+                // $currentNode before checked value
+                $nodeBeforeValue = $currentNode;
+            }
+
+            $currentNode = $currentNode->getNextNode();
+        }
+    }
+
+    public function shift(): string|int|null
+    {
+        if ($this->rootNode === null) {
+            return null;
+        }
+
+        $currentNode = $this->rootNode;
+        $nextNode = $currentNode->getNextNode();
+        $this->rootNode = $nextNode;
+
+        return $currentNode->getValue();
+    }
+
+    public function pop(): string|int|null
+    {
+        if ($this->rootNode === null) {
+            return null;
+        }
+
+        $previousNode = null;
+        $lastNode = $this->rootNode;
+        $currentNode = $this->rootNode;
+        while ($currentNode->getNextNode()) {
+            $currentNode = $currentNode->getNextNode();
+            $previousNode = $lastNode;
+            $lastNode = $currentNode;
+        }
+
+        if ($previousNode) {
+            $previousNode->setNextNode(null);
+        } else {
+            $this->rootNode = null;
+        }
+
+        return $lastNode->getValue();
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    private function checkValueType(int|string $value): void
+    {
+        if (!$this->isEmpty()
+            && ($this->isNotValidInt($value) || $this->isNotValidString($value))
+        ) {
+            throw new InvalidArgumentException("Value type should be the same as other values in SortedLinkedList");
+        }
+    }
+
+    private function isFirstNodeBeforeOrEqualToSecond(Node $firstNode, Node $secondNode): bool
+    {
+        return !$this->comparator->isFirstNodeBeforeSecond($secondNode, $firstNode);
+    }
+
+    private function isFirstNodeBeforeSecond(Node $firstNode, Node $secondNode): bool
+    {
+        return $this->comparator->isFirstNodeBeforeSecond($firstNode, $secondNode);
     }
 }
