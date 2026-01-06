@@ -5,6 +5,8 @@ namespace Sergiobelya\DataStructures;
 
 use Countable;
 use InvalidArgumentException;
+use Sergiobelya\DataStructures\SortedLinkedList\ComparatorFactory;
+use Sergiobelya\DataStructures\SortedLinkedList\ComparatorInterface;
 use Sergiobelya\DataStructures\SortedLinkedList\Node;
 use Sergiobelya\DataStructures\SortedLinkedList\NodeFactory;
 
@@ -12,18 +14,24 @@ class SortedLinkedList implements Countable
 {
     private ?Node $rootNode;
 
-    private NodeFactory $factory;
+    private NodeFactory $nodeFactory;
+
+    private ComparatorFactory $comparatorFactory;
 
     /**
      * @var int one of php constants: SORT_ASC, SORT_DESC
      */
     private int $sortOrder;
 
+    private ComparatorInterface $comparator;
+
     public function __construct()
     {
         $this->rootNode = null;
         $this->sortOrder = SORT_ASC;
-        $this->factory = new NodeFactory();
+        $this->nodeFactory = new NodeFactory();
+        $this->comparatorFactory = new ComparatorFactory();
+        $this->comparator = $this->comparatorFactory->create($this->sortOrder);
     }
 
     /**
@@ -32,11 +40,11 @@ class SortedLinkedList implements Countable
     public function add(string|int $value): void
     {
         if ($this->rootNode === null) {
-            $this->rootNode = $this->factory->createNode($value);
+            $this->rootNode = $this->nodeFactory->createNode($value);
         } else {
             $this->checkValueType($value);
-            $addedNode = $this->factory->createNode($value);
-            if ($this->isValueBeforeRoot($value)) {
+            $addedNode = $this->nodeFactory->createNode($value);
+            if ($this->isNodeBeforeRoot($addedNode)) {
                 $this->changeRoot($addedNode);
             } else {
                 $this->insertBetweenNodes($addedNode);
@@ -65,15 +73,9 @@ class SortedLinkedList implements Countable
         return is_string($value) && !is_string($this->rootNode->getValue());
     }
 
-    private function isValueBeforeRoot(int|string $value): bool
+    private function isNodeBeforeRoot(Node $node): bool
     {
-        if ($this->sortOrder === SORT_ASC) {
-            $before = $value <= $this->rootNode->getValue();
-        } else {
-            $before = $value >= $this->rootNode->getValue();
-        }
-
-        return $before;
+        return $this->comparator->isFirstNodeBeforeSecond($node, $this->rootNode);
     }
 
     private function changeRoot(Node $addedNode): void
@@ -96,13 +98,7 @@ class SortedLinkedList implements Countable
 
     private function isFirstNodeBeforeSecond(Node $firstNode, Node $secondNode): bool
     {
-        if ($this->sortOrder === SORT_ASC) {
-            $before = $firstNode->getValue() < $secondNode->getValue();
-        } else {
-            $before = $firstNode->getValue() > $secondNode->getValue();
-        }
-
-        return $before;
+        return $this->comparator->isFirstNodeBeforeSecond($firstNode, $secondNode);
     }
 
     public function isEmpty(): bool
