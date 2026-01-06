@@ -132,4 +132,43 @@ final class SortedLinkedListTest extends TestCase
         $this->assertSame('', $concatResult);
         $this->assertSame(0, $i);
     }
+
+    public function testExistsInvalidType(): void
+    {
+        $list = new SortedLinkedList();
+        $list->add('7');
+        $list->add('5');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $list->isValueExists(5);
+    }
+
+    public function testExistsString(): void
+    {
+        $list = new SortedLinkedList();
+        $list->add('5');
+        $list->add('7');
+
+        $this->assertTrue($list->isValueExists('7'));
+    }
+
+    public function testExistsInt(): void
+    {
+        $list = new SortedLinkedList();
+        $list->add(5);
+        $list->add(7);
+
+        $this->assertTrue($list->isValueExists(5));
+    }
+
+    public function testNotExists(): void
+    {
+        $list = new SortedLinkedList();
+        $list->add(5);
+        $list->add(7);
+
+        $this->assertFalse($list->isValueExists(4));
+        $this->assertFalse($list->isValueExists(6));
+        $this->assertFalse($list->isValueExists(8));
+    }
 }
