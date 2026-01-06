@@ -140,4 +140,26 @@ class SortedLinkedList implements Countable, IteratorAggregate
             $currentNode = $currentNode->getNextNode();
         }
     }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function isValueExists(string|int $value): bool
+    {
+        $this->checkValueType($value);
+        $tempNode = $this->nodeFactory->createNode($value);
+
+        $exists = false;
+        $currentNode = $this->rootNode;
+        // iterate while $currentNode before or equal to checked value
+        while ($currentNode && !$this->isFirstNodeBeforeSecond($tempNode, $currentNode)) {
+            if ($currentNode->getValue() === $value) {
+                $exists = true;
+                break;
+            }
+            $currentNode = $currentNode->getNextNode();
+        }
+
+        return $exists;
+    }
 }
