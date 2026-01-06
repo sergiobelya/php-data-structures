@@ -5,7 +5,7 @@ namespace Sergiobelya\DataStructures\SortedLinkedList;
 /**
  * @internal
  */
-class NodeFactory
+final class NodeFactory
 {
     public function createNode(string|int $value): Node
     {

@@ -5,12 +5,14 @@ namespace Sergiobelya\DataStructures;
 
 use Countable;
 use InvalidArgumentException;
+use IteratorAggregate;
 use Sergiobelya\DataStructures\SortedLinkedList\ComparatorFactory;
 use Sergiobelya\DataStructures\SortedLinkedList\ComparatorInterface;
 use Sergiobelya\DataStructures\SortedLinkedList\Node;
 use Sergiobelya\DataStructures\SortedLinkedList\NodeFactory;
+use Traversable;
 
-class SortedLinkedList implements Countable
+class SortedLinkedList implements Countable, IteratorAggregate
 {
     private ?Node $rootNode;
 
@@ -128,5 +130,14 @@ class SortedLinkedList implements Countable
         }
 
         return $result;
+    }
+
+    public function getIterator(): Traversable
+    {
+        $currentNode = $this->rootNode;
+        while ($currentNode) {
+            yield $currentNode->getValue();
+            $currentNode = $currentNode->getNextNode();
+        }
     }
 }
