@@ -3,14 +3,15 @@
     "description": "PHP library for data structures like Sorted Linked List",
     "type": "library",
     "require-dev": {
-        "phpunit/phpunit": "^10.5",
+        "phpunit/phpunit": "^12.5",
         "phpstan/phpstan": "^2.1",
         "squizlabs/php_codesniffer": "^4.0"
     },
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Sergiobelya\\DataStructures\\": "src/"
+            "Sergiobelya\\DataStructures\\": "src/",
+            "Sergiobelya\\DataStructures\\Tests\\": "tests/"
         }
     },
     "authors": [
@@ -19,5 +20,7 @@
             "email": "sergiobelya@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "php": "^8.3"
+    }
 }
