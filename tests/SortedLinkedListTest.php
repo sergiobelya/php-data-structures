@@ -39,7 +39,8 @@ final class SortedLinkedListTest extends TestCase
         yield 'add last' => [[5, 6], [5, 6]];
         yield 'add between' => [[5, 15, 10], [5, 10, 15]];
         yield 'duplicated values' => [[4, 5, 5, 4], [4, 4, 5, 5]];
-        yield 'full sort int' => [[4, 5, 3, 15, 10, 5, 25], [3, 4, 5, 5, 10, 15, 25]];
+        yield 'negative values' => [[-5, -10, 0, -8], [-10, -8, -5, 0]];
+        yield 'full sort int' => [[0, 4, 5, 3, 15, 10, 5, -30, 25], [-30, 0, 3, 4, 5, 5, 10, 15, 25]];
         yield 'full sort string' => [
             ['a4', 'a5', 'a3', 'b15', 'b10', 'a5', 'b25'],
             ['a3', 'a4', 'a5', 'a5', 'b10', 'b15', 'b25']
@@ -101,6 +102,7 @@ final class SortedLinkedListTest extends TestCase
         $this->assertSame(1, $list->count());
         $list->add('6');
         $this->assertSame(2, $list->count());
+        $this->assertSame(2, count($list));
     }
 
     public function testIteration(): void
@@ -133,7 +135,7 @@ final class SortedLinkedListTest extends TestCase
         $this->assertSame(0, $i);
     }
 
-    public function testExistsInvalidType(): void
+    public function testIsValueExistsInvalidType(): void
     {
         $list = new SortedLinkedList();
         $list->add('7');
@@ -143,7 +145,7 @@ final class SortedLinkedListTest extends TestCase
         $list->isValueExists(5);
     }
 
-    public function testExistsString(): void
+    public function testIsValueExistsString(): void
     {
         $list = new SortedLinkedList();
         $list->add('5');
@@ -152,7 +154,7 @@ final class SortedLinkedListTest extends TestCase
         $this->assertTrue($list->isValueExists('7'));
     }
 
-    public function testExistsInt(): void
+    public function testIsValueExistsInt(): void
     {
         $list = new SortedLinkedList();
         $list->add(5);
@@ -170,5 +172,60 @@ final class SortedLinkedListTest extends TestCase
         $this->assertFalse($list->isValueExists(4));
         $this->assertFalse($list->isValueExists(6));
         $this->assertFalse($list->isValueExists(8));
+    }
+
+    public function testDelete()
+    {
+        $list = new SortedLinkedList();
+        $list->add(5);
+        $list->add(7);
+        $list->add(5);
+        $this->assertSame(3, $list->count());
+
+        $list->delete(5);
+        $this->assertSame(1, $list->count());
+
+        $list->delete(4);
+        $this->assertSame(1, $list->count());
+
+        $list->delete(7);
+        $this->assertSame(0, $list->count());
+
+        $list->delete(18);
+        $this->assertSame(0, $list->count());
+    }
+
+    public function testShift()
+    {
+        $list = new SortedLinkedList();
+        $list->add(-7);
+        $list->add(-5);
+
+        $firstValue = $list->shift();
+        $this->assertSame(-7, $firstValue);
+        $this->assertSame(1, $list->count());
+
+        $secondValue = $list->shift();
+        $this->assertSame(-5, $secondValue);
+        $this->assertSame(0, $list->count());
+
+        $this->assertNull($list->shift());
+    }
+
+    public function testPop()
+    {
+        $list = new SortedLinkedList();
+        $list->add('7');
+        $list->add('5');
+
+        $lastValue = $list->pop();
+        $this->assertSame('7', $lastValue);
+        $this->assertSame(1, $list->count());
+
+        $lastValue = $list->pop();
+        $this->assertSame('5', $lastValue);
+        $this->assertSame(0, $list->count());
+
+        $this->assertNull($list->pop());
     }
 }
