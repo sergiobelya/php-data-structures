@@ -183,12 +183,14 @@ final class SortedLinkedListTest extends TestCase
         $this->assertSame(3, $list->count());
 
         $list->delete(5);
+        $this->assertFalse($list->isValueExists(5));
         $this->assertSame(1, $list->count());
 
         $list->delete(4);
         $this->assertSame(1, $list->count());
 
         $list->delete(7);
+        $this->assertFalse($list->isValueExists(7));
         $this->assertSame(0, $list->count());
 
         $list->delete(18);
@@ -227,5 +229,62 @@ final class SortedLinkedListTest extends TestCase
         $this->assertSame(0, $list->count());
 
         $this->assertNull($list->pop());
+    }
+
+    public function testReverse(): void
+    {
+        $originalData = [0, 4, 5, 3, 15, 10, 5, -30, 25];
+        $ascendingData = [-30, 0, 3, 4, 5, 5, 10, 15, 25];
+        $descendingData = [25, 15, 10, 5, 5, 4, 3, 0, -30];
+
+        $sortedList = new SortedLinkedList();
+        $sortedList->reverse();
+        foreach ($originalData as $value) {
+            // check method add when sortOrder is descending
+            $sortedList->add($value);
+        }
+
+        $this->assertSame($descendingData, $sortedList->toArray());
+        $this->assertTrue($sortedList->isValueExists(25));
+        $this->assertTrue($sortedList->isValueExists(-30));
+        $this->assertTrue($sortedList->isValueExists(5));
+        $this->assertFalse($sortedList->isValueExists(-31));
+        $this->assertFalse($sortedList->isValueExists(26));
+        $this->assertFalse($sortedList->isValueExists(18));
+
+        $sortedList->reverse();
+        $this->assertSame($ascendingData, $sortedList->toArray());
+    }
+
+    public function testReverseDeleteShiftPop(): void
+    {
+        $originalData = [0, 4, 5, 3, 15, 10, 5, -30, 25];
+
+        $descendingList = new SortedLinkedList();
+        $descendingList->reverse();
+        foreach ($originalData as $value) {
+            $descendingList->add($value);
+        }
+
+        // check methods delete, shift, pop, isValueExists, count when nodes in descending order
+        $this->assertTrue($descendingList->isValueExists(0));
+        $this->assertFalse($descendingList->isValueExists(30));
+        $this->assertSame(9, $descendingList->count());
+
+        $descendingList->delete(0);
+        $this->assertFalse($descendingList->isValueExists(0));
+        $this->assertSame(8, $descendingList->count());
+
+        $firstValue = $descendingList->shift();
+        $this->assertSame(25, $firstValue);
+        $this->assertFalse($descendingList->isValueExists(25));
+        $this->assertSame(7, $descendingList->count());
+
+        $lastValue = $descendingList->pop();
+        $this->assertSame(-30, $lastValue);
+        $this->assertFalse($descendingList->isValueExists(-30));
+        $this->assertSame(6, $descendingList->count());
+
+        $this->assertSame([15, 10, 5, 5, 4, 3], $descendingList->toArray());
     }
 }
