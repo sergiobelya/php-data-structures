@@ -180,7 +180,7 @@ class SortedLinkedList implements Countable, IteratorAggregate
 
     public function shift(): string|int|null
     {
-        if ($this->rootNode === null) {
+        if ($this->isEmpty()) {
             return null;
         }
 
@@ -193,7 +193,7 @@ class SortedLinkedList implements Countable, IteratorAggregate
 
     public function pop(): string|int|null
     {
-        if ($this->rootNode === null) {
+        if ($this->isEmpty()) {
             return null;
         }
 
@@ -213,6 +213,30 @@ class SortedLinkedList implements Countable, IteratorAggregate
         }
 
         return $lastNode->getValue();
+    }
+
+    public function reverse(): void
+    {
+        $this->changeSortOrder();
+        if ($this->rootNode?->getNextNode() === null) {
+            // skip if 0 or 1 elements
+            return;
+        }
+
+        $originalChain = clone $this;
+        $this->rootNode = null; // reset current chain in previous sort order
+        foreach ($originalChain as $value) {
+            // fill values from last to first (because previous first value will be last in changed chain),
+            // use changeRoot for each value, in that case each iteration takes O(1) instead of O(N)
+            $this->add($value);
+        }
+        unset($originalChain);
+    }
+
+    private function changeSortOrder(): void
+    {
+        $this->sortOrder = ($this->sortOrder === SORT_ASC) ? SORT_DESC : SORT_ASC;
+        $this->comparator = $this->comparatorFactory->create($this->sortOrder);
     }
 
     /**
